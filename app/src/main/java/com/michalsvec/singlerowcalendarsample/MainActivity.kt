@@ -4,14 +4,15 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.michalsvec.singlerowcalendar.calendar.CalendarChangesObserver
 import com.michalsvec.singlerowcalendar.calendar.CalendarViewManager
+import com.michalsvec.singlerowcalendar.calendar.SingleRowCalendar
 import com.michalsvec.singlerowcalendar.calendar.SingleRowCalendarAdapter
 import com.michalsvec.singlerowcalendar.selection.CalendarSelectionManager
 import com.michalsvec.singlerowcalendar.utils.DateUtils
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.calendar_item.view.*
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -19,9 +20,21 @@ class MainActivity : AppCompatActivity() {
     private val calendar = Calendar.getInstance()
     private var currentMonth = 0
 
+    private lateinit var tvDate: TextView
+    private lateinit var tvDay: TextView
+    private lateinit var btnRight: Button
+    private lateinit var btnLeft: Button
+    private lateinit var singleRowCalendar: SingleRowCalendar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        tvDate = findViewById(R.id.tvDate)
+        tvDay = findViewById(R.id.tvDay)
+        btnRight = findViewById(R.id.btnRight)
+        btnLeft = findViewById(R.id.btnLeft)
+        singleRowCalendar = findViewById(R.id.main_single_row_calendar)
 
         // set current date to calendar and current month to currentMonth variable
         calendar.time = Date()
@@ -75,9 +88,8 @@ class MainActivity : AppCompatActivity() {
             ) {
                 // using this method we can bind data to calendar view
                 // good practice is if all views in layout have same IDs in all item views
-                holder.itemView.tv_date_calendar_item.text = DateUtils.getDayNumber(date)
-                holder.itemView.tv_day_calendar_item.text = DateUtils.getDay3LettersName(date)
-
+                holder.itemView.findViewById<TextView>(R.id.tv_date_calendar_item).text = DateUtils.getDayNumber(date)
+                holder.itemView.findViewById<TextView>(R.id.tv_day_calendar_item).text = DateUtils.getDay3LettersName(date)
             }
         }
 
@@ -90,8 +102,6 @@ class MainActivity : AppCompatActivity() {
                 tvDay.text = DateUtils.getDayName(date)
                 super.whenSelectionChanged(isSelected, position, date)
             }
-
-
         }
 
         // selection manager is responsible for managing selection
@@ -110,7 +120,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // here we init our calendar, also you can set more properties if you haven't specified in XML layout
-        val singleRowCalendar = main_single_row_calendar.apply {
+        singleRowCalendar.apply {
             calendarViewManager = myCalendarViewManager
             calendarChangesObserver = myCalendarChangesObserver
             calendarSelectionManager = mySelectionManager
@@ -152,7 +162,6 @@ class MainActivity : AppCompatActivity() {
         currentMonth = calendar[Calendar.MONTH]
         return getDates(mutableListOf())
     }
-
 
     private fun getDates(list: MutableList<Date>): List<Date> {
         // load dates of whole month
